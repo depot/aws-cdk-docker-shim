@@ -9,3 +9,14 @@ env PATH="$(pwd)/shim:$PATH" cdk ...
 ```
 
 This assumes that you've moved the `shim` directory to the same directory as your `cdk` app.
+
+You would also either need to have a `depot.json` file in your local directory to configure your Depot project ID, or pass it via the `buildArgs` option to `DockerImageAsset`:
+
+```typescript
+new DockerImageAsset(this, "Image", {
+  directory: "docker",
+  buildArgs: {
+    project: "my-project-id",
+  },
+});
+```
