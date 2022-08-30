@@ -1,0 +1,19 @@
+#/usr/bin/env bash
+set -e
+
+command="$1"
+
+if [[ "$command" == "build" ]]; then
+  exec depot build "$@"
+else
+  real_docker="$(which docker)"
+
+  # If Docker is resolved to this file, find the real Docker binary
+  self=$(readlink -f "${BASH_SOURCE[0]}")
+  basename=$(basename "$self")
+  if [[ "$real_docker" == "$self" ]]; then
+    real_docker="$(which -a docker | head -2 | tail -1)"
+  fi
+
+  echo "$real_docker" "$@"
+fi
