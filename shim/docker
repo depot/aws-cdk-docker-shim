@@ -10,7 +10,6 @@ else
 
   # If Docker is resolved to this file, find the real Docker binary
   self=$(readlink -f "${BASH_SOURCE[0]}")
-  basename=$(basename "$self")
   if [[ "$real_docker" == "$self" ]]; then
     real_docker="$(which -a docker | head -2 | tail -1)"
   fi
