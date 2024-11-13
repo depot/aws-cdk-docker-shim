@@ -22,10 +22,8 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-args+=("$@")
-
 if [[ "$command" == "build" ]]; then
-    exec depot build "${args[@]}" --load
+    exec depot "${args[@]}" build --load "$@"
 else
     real_docker="$(which docker)"
 
@@ -35,10 +33,9 @@ else
         real_docker="$(which -a docker | head -2 | tail -1)"
     fi
 
-    # If no command was found, pass all args to docker
     if [[ -z "$command" ]]; then
         exec "$real_docker" "${args[@]}"
     else
-        exec "$real_docker" "$command" "${args[@]}"
+        exec "$real_docker" "${args[@]}" "$command" "$@"
     fi
 fi
