@@ -1,18 +1,44 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 set -e
 
-command="$1"
+command=""
+args=()
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -*)
+            args+=("$1")
+            if [[ "$2" && "$2" != -* ]]; then
+                args+=("$2")
+                shift
+            fi
+            ;;
+        *)
+            command="$1"
+            shift
+            break
+            ;;
+    esac
+    shift
+done
+
+args+=("$@")
 
 if [[ "$command" == "build" ]]; then
-  exec depot build "$@"
+    exec depot build "${args[@]}" --load
 else
-  real_docker="$(which docker)"
+    real_docker="$(which docker)"
 
-  # If Docker is resolved to this file, find the real Docker binary
-  self=$(readlink -f "${BASH_SOURCE[0]}")
-  if [[ "$real_docker" == "$self" ]]; then
-    real_docker="$(which -a docker | head -2 | tail -1)"
-  fi
+    # If Docker is resolved to this file, find the real Docker binary
+    self=$(readlink -f "${BASH_SOURCE[0]}")
+    if [[ "$real_docker" == "$self" ]]; then
+        real_docker="$(which -a docker | head -2 | tail -1)"
+    fi
 
-  echo "$real_docker" "$@"
+    # If no command was found, pass all args to docker
+    if [[ -z "$command" ]]; then
+        exec "$real_docker" "${args[@]}"
+    else
+        exec "$real_docker" "$command" "${args[@]}"
+    fi
 fi
